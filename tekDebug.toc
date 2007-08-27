@@ -1,0 +1,14 @@
+## Interface: 20100
+
+## Title: tekDebug
+## Notes: OptionHouse-based debug output frame thing
+## Author: Tekkub Stoutwrithe
+## Version: Alpha
+## X-Category: Development Tools
+
+## OptionalDeps: Dongle, Optionhouse, TomTom
+
+Dongle.lua
+OptionHouse.lua
+
+tekDebug.lua
