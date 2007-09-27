@@ -1,7 +1,6 @@
 
 
-local frames = {}
-
+local frames, oh = {}
 
 tekDebug = DongleStub("Dongle-1.0"):New("tekDebug")
 
@@ -9,8 +8,9 @@ tekDebug = DongleStub("Dongle-1.0"):New("tekDebug")
 function tekDebug:Enable()
 	local _, title = GetAddOnInfo("tekDebug")
 	local author, version = GetAddOnMetadata("tekDebug", "Author"), GetAddOnMetadata("tekDebug", "Version")
-	local oh = LibStub("OptionHouse-1.1")):RegisterAddOn("tekDebug", title, author, version)
+	oh = LibStub("OptionHouse-1.1"):RegisterAddOn("tekDebug", title, author, version)
 	for name,frame in pairs(frames) do oh:RegisterCategory(name, function() return frame end) end
+	self.Enable = nil
 end
 
 
@@ -46,6 +46,7 @@ function tekDebug:GetFrame(name)
 
 	frames[name] = f
 
+	if oh then oh:RegisterCategory(name, function() return f end) end
 	return f
 end
 
