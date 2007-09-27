@@ -9,7 +9,7 @@ tekDebug = DongleStub("Dongle-1.0"):New("tekDebug")
 function tekDebug:Enable()
 	local _, title = GetAddOnInfo("tekDebug")
 	local author, version = GetAddOnMetadata("tekDebug", "Author"), GetAddOnMetadata("tekDebug", "Version")
-	local oh = DongleStub("OptionHouse-1.0"):RegisterAddOn("tekDebug", title, author, version)
+	local oh = LibStub("OptionHouse-1.1")):RegisterAddOn("tekDebug", title, author, version)
 	for name,frame in pairs(frames) do oh:RegisterCategory(name, function() return frame end) end
 end
 
