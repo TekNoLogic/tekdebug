@@ -30,7 +30,7 @@ function tekDebug:GetFrame(name)
 
 	local f = CreateFrame("ScrollingMessageFrame", nil, UIParent)
 	f:SetMaxLines(250)
-	f:SetFontObject(ChatFontNormal)
+	f:SetFontObject(ChatFontSmall)
 	f:SetJustifyH("LEFT")
 	f:SetFading(false)
 	f:EnableMouseWheel(true)
