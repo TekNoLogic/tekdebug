@@ -1,17 +1,111 @@
 
 
-local frames, oh = {}
+--[[
+How do you use this bugger? simple!
 
-tekDebug = DongleStub("Dongle-1.0"):New("tekDebug")
+local f = tekDebug:GetFrame("MyAddon")
+This gets you a ScrollingMessageFrame to output debuggery into.  You can call f:AddMessage() directly if you like, pass it off to your Debug lib, whatever.
+
+In my addons this is what I do...
+Force tD to load before your addon if present
+## OptionalDeps: tekDebug
+
+Then make a Debug function (note, this version is NOT nil-safe)
+
+local debugf = tekDebug and tekDebug:GetFrame("MyAddon")
+local function Debug(...) if debugf then debugf:AddMessage(string.join(", ", ...)) end end
+
+Or, if you use Dongle:
+
+MyAddon = DongleStub("Dongle-1.0"):New("MyAddon")
+if tekDebug then MyAddon:EnableDebug(1, tekDebug:GetFrame("MyAddon")) end
+]]
 
 
-function tekDebug:Enable()
-	local _, title = GetAddOnInfo("tekDebug")
-	local author, version = GetAddOnMetadata("tekDebug", "Author"), GetAddOnMetadata("tekDebug", "Version")
-	oh = LibStub("OptionHouse-1.1"):RegisterAddOn("tekDebug", title, author, version)
-	for name,frame in pairs(frames) do oh:RegisterCategory(name, function() return frame end) end
-	self.Enable = nil
-end
+local frames, names, refresh = {}, {}
+local panel = LibStub("tekPanel-Auction").new("tekDebugPanel", "tekDebug", true)
+tekDebug = {}
+
+
+panel:SetScript("OnShow", function(self)
+	local buttons, offset = {}, 0
+
+	local function OnClick(self)
+		if not self.scrollframe then return end
+
+		local frame = self.scrollframe
+		if frame:IsVisible() then
+			frame:Hide()
+			self:UnlockHighlight()
+		else
+			for _,f in pairs(frames) do f:Hide() end
+			for _,f in pairs(buttons) do f:UnlockHighlight() end
+
+			frame:SetParent(panel)
+			frame:ClearAllPoints()
+			frame:SetPoint("TOPLEFT", 190, -103)
+			frame:SetWidth(630) frame:SetHeight(305)
+			frame:SetFrameStrata("DIALOG")
+			frame:Show()
+
+			self:LockHighlight()
+		end
+	end
+
+	local function OnMouseWheel(self, v)
+		if v > 0 then -- up
+			offset = math.max(offset - 1, 0)
+			refresh()
+		else -- down
+			offset = math.max(math.min(offset + 1, #names - 15), 0)
+			refresh()
+		end
+	end
+
+	function refresh()
+		for i=1,15 do
+			local frame, name = buttons[i], names[i+offset]
+			if name then
+				frame.text:SetText(name)
+				frame.scrollframe = frames[name]
+				if frames[name]:IsVisible() then frame:LockHighlight() else frame:UnlockHighlight() end
+				frame:Show()
+			else
+				frame:Hide()
+			end
+		end
+	end
+
+	for i=1,15 do
+		local button = CreateFrame("Button", nil, panel)
+		button:SetWidth(158) button:SetHeight(20)
+		if i == 1 then button:SetPoint("TOPLEFT", self, 23, -105) else button:SetPoint("TOP", buttons[i-1], "BOTTOM", 0, 0) end
+
+		button:SetHighlightFontObject(GameFontHighlightSmall)
+		button:SetNormalFontObject(GameFontNormalSmall)
+
+		button:SetNormalTexture("Interface\\AuctionFrame\\UI-AuctionFrame-FilterBG")
+		button:GetNormalTexture():SetTexCoord(0, 0.53125, 0, 0.625)
+
+		button:SetHighlightTexture("Interface\\PaperDollInfoFrame\\UI-Character-Tab-Highlight")
+		button:GetHighlightTexture():SetBlendMode("ADD")
+
+		button.text = button:CreateFontString(nil, "OVERLAY", "GameFontWhite")
+		button.text:SetText("Test")
+		button.text:SetPoint("LEFT", button, 10, 0)
+		button.text:SetPoint("RIGHT", button, -10, 0)
+		button.text:SetJustifyH("LEFT")
+
+		button:EnableMouseWheel()
+		button:SetScript("OnMouseWheel", OnMouseWheel)
+		button:SetScript("OnClick", OnClick)
+
+		buttons[i] = button
+	end
+
+	refresh()
+	self:SetScript("OnShow", nil)
+end)
 
 
 local function OnMouseWheel(frame, delta)
@@ -45,9 +139,32 @@ function tekDebug:GetFrame(name)
 	end
 
 	frames[name] = f
+	table.insert(names, name)
+	table.sort(names)
+	if refresh then refresh() end
 
-	if oh then oh:RegisterCategory(name, function() return f end) end
 	return f
 end
 
 
+-----------------------------
+--      Slash Handler      --
+-----------------------------
+
+SLASH_TEKDEBUG1 = "/td"
+SLASH_TEKDEBUG2 = "/tekdebug"
+function SlashCmdList.TEKDEBUG() ShowUIPanel(panel) end
+
+
+----------------------------------------
+--      Quicklaunch registration      --
+----------------------------------------
+
+local ldb = LibStub and LibStub:GetLibrary("LibDataBroker-1.1", true)
+if ldb then
+	ldb:NewDataObject("tekDebug", {
+		type = "launcher",
+		icon = "Interface\\Icons\\Spell_Shadow_CarrionSwarm",
+		OnClick = SlashCmdList.TEKDEBUG,
+	})
+end
