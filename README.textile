@@ -1,0 +1,31 @@
+tekDebug is a debug output addon for developers.  It provides a handy place to dump debug output for your addon, without spamming the chatframes of your users.  To see debug output, the user must install tekDebug.
+
+h2. Adding support to your addon
+
+So how do you use this bugger with your addon? simple!
+<pre>local f = tekDebug:GetFrame("MyAddon")</pre>
+
+This gets you a ScrollingMessageFrame to output debuggery into.  You can call <code>f:AddMessage(...)</code> directly if you like, pass it off to your Debug lib, whatever.
+
+In my addons this is what I do...
+
+Force tekDebug to load before the addon, if present:
+<pre>## OptionalDeps: tekDebug</pre>
+
+Then make a Debug function (note, this version is NOT nil-safe)
+<pre>local debugf = tekDebug and tekDebug:GetFrame("MyAddon")
+local function Debug(...) if debugf then debugf:AddMessage(string.join(", ", ...)) end end</pre>
+
+Or, if you use Dongle:
+<pre>MyAddon = DongleStub("Dongle-1.0"):New("MyAddon")
+if tekDebug then MyAddon:EnableDebug(1, tekDebug:GetFrame("MyAddon")) end</pre>
+
+h2. Accessing the output
+
+Now that you've got your debug redirected, how do you view it?  If you use an "LDB":http://github.com/tekkub/libdatabroker-1-1/wikis quicklauncher addon, you'll get a launcher there.  Otherwise, you can just type @/tekdebug@ or @/td@
+
+h2. Links
+
+<b>Visit "my site":http://www.tekkub.net/addons/tekDebug for more info.<br>
+Please report all bugs and feature requests to my "Google Code":http://code.google.com/p/tekkub-wow/issues/list?can=1&q=addon:tekDebug&sort=status+milestone&colspec=ID%20Type%20Status%20Addon%20Milestone%20Summary tracker<br>
+Please direct all feedback and questions to my "Google Groups":http://groups-beta.google.com/group/tekkub-wow mailinglist.</b>
