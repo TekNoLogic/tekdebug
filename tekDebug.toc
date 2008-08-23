@@ -6,5 +6,7 @@
 ## Version: Alpha
 ## X-Category: Development Tools
 
+LibStub.lua
 tekPanelAuction.lua
+
 tekDebug.lua
