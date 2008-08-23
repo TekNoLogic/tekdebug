@@ -4,6 +4,8 @@
 ## Notes: Debug output frame thing
 ## Author: Tekkub Stoutwrithe
 ## Version: Alpha
+## X-Website: http://www.tekkub.net/
+## X-Email: tekkub-wow@googlegroups.com
 ## X-Category: Development Tools
 
 LibStub.lua
