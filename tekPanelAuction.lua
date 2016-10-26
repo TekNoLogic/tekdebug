@@ -1,6 +1,6 @@
 
 
-local lib, oldminor = LibStub:NewLibrary("tekPanel-Auction", 9)
+local lib, oldminor = LibStub:NewLibrary("tekPanel-Auction", 10)
 if not lib then return end
 oldminor = oldminor or 0
 
@@ -15,7 +15,6 @@ end
 
 function lib.new(name, titletext, splitstyle)
 	local frame = CreateFrame("Frame", name, UIParent)
-	frame:CreateTitleRegion()
 	frame:SetToplevel(true)
 	frame:SetFrameLevel(100) -- Force frame to a high level so it shows on top the first time it's displayed
 	frame:SetWidth(832) frame:SetHeight(447)
@@ -29,10 +28,6 @@ function lib.new(name, titletext, splitstyle)
 	frame:SetAttribute("UIPanelLayout-area", "doublewide")
 	frame:SetAttribute("UIPanelLayout-whileDead", true)
 	table.insert(UISpecialFrames, name)
-
-	local title = frame:GetTitleRegion()
-	title:SetWidth(757) title:SetHeight(20)
-	title:SetPoint("TOPLEFT", 75, -15)
 
 	local portrait = createtex(frame, "OVERLAY", 57, 57, "TOPLEFT", 9, -7)
 	SetPortraitTexture(portrait, "player")
@@ -204,4 +199,3 @@ function lib.newpanel(base, splitstyle)
 
 	return frame
 end
-
